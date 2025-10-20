@@ -1,0 +1,16 @@
+# Gestor de Tareas con Dependencias - Requisitos
+# Este proyecto utiliza solo bibliotecas estándar de Python
+
+# Python 3.11+ requerido
+# python>=3.11
+
+# Las siguientes bibliotecas vienen incluidas con Python:
+# - tkinter: Interfaz gráfica (estándar)
+# - sqlite3: Base de datos (estándar)
+# - collections: Estructuras de datos (estándar)
+# - datetime: Manejo de fechas (estándar)
+# - typing: Tipado (estándar)
+
+# Si se desean características adicionales en futuras versiones:
+# matplotlib>=3.6.0  # Para visualización de grafos
+# networkx>=3.0      # Algoritmos avanzados de grafos
