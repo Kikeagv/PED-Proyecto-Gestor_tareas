@@ -2,16 +2,14 @@
 """
 Interfaz Web Moderna - Gestor de Tareas con Dependencias
 Sistema completo con UI profesional para Fase 2
+Universidad Don Bosco - PED
 """
 
 import sys
 import os
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
-import urllib.parse
 from datetime import datetime
-import sqlite3
-import traceback
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
@@ -20,7 +18,6 @@ from controllers.gestor_proyecto import GestorProyecto
 _gestor_instance = None
 
 def get_gestor():
-    """Get or create the global gestor instance"""
     global _gestor_instance
     if _gestor_instance is None:
         _gestor_instance = GestorProyecto('gestor_tareas_web.db')
@@ -28,7 +25,6 @@ def get_gestor():
 
 
 class ModernWebHandler(BaseHTTPRequestHandler):
-    """Handler HTTP para la interfaz web moderna"""
 
     def __init__(self, *args, **kwargs):
         if not hasattr(ModernWebHandler, '_gestor_initialized'):
@@ -37,7 +33,6 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         super().__init__(*args, **kwargs)
 
     def do_GET(self):
-        """Maneja solicitudes GET"""
         try:
             if self.path == '/' or self.path == '/index.html':
                 self.serve_html()
@@ -49,7 +44,6 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             self.send_error_response(str(e))
 
     def do_POST(self):
-        """Maneja solicitudes POST"""
         try:
             if self.path.startswith('/api/'):
                 self.handle_api_post()
@@ -59,7 +53,6 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             self.send_error_response(str(e))
 
     def do_DELETE(self):
-        """Maneja solicitudes DELETE"""
         try:
             if self.path.startswith('/api/'):
                 self.handle_api_delete()
@@ -69,7 +62,6 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             self.send_error_response(str(e))
 
     def do_PUT(self):
-        """Maneja solicitudes PUT"""
         try:
             if self.path.startswith('/api/'):
                 self.handle_api_put()
@@ -79,7 +71,6 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             self.send_error_response(str(e))
 
     def do_OPTIONS(self):
-        """Handle CORS preflight requests"""
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
@@ -87,7 +78,6 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def serve_html(self):
-        """Sirve la pagina HTML principal con UI moderna"""
         html_content = self.get_modern_html()
         self.send_response(200)
         self.send_header('Content-type', 'text/html; charset=utf-8')
@@ -100,27 +90,42 @@ class ModernWebHandler(BaseHTTPRequestHandler):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Tareas con Dependencias - UDB</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Gestor de Tareas | UDB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&family=Public+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --secondary: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #1e293b;
-            --dark-light: #334155;
-            --gray: #64748b;
-            --gray-light: #94a3b8;
-            --light: #f1f5f9;
-            --white: #ffffff;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius: 12px;
-            --radius-lg: 16px;
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #161616;
+            --bg-tertiary: #1f1f1f;
+            --bg-card: #1a1a1a;
+            --bg-hover: #252525;
+            
+            --text-primary: #e8e6e3;
+            --text-secondary: #a8a5a0;
+            --text-muted: #6b6965;
+            
+            --accent: #e85d04;
+            --accent-light: #f48c06;
+            --accent-glow: rgba(232, 93, 4, 0.15);
+            
+            --success: #2ec4b6;
+            --warning: #ffbe0b;
+            --danger: #e63946;
+            
+            --border: #2a2a2a;
+            --border-light: #333;
+            
+            --font-display: 'Fraunces', Georgia, serif;
+            --font-body: 'Public Sans', -apple-system, sans-serif;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            
+            --shadow: 0 4px 20px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 30px var(--accent-glow);
         }
 
         * {
@@ -129,31 +134,103 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: var(--dark);
+        html {
+            font-size: 16px;
         }
 
-        .app-container {
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
-            background: var(--light);
+            overflow-x: hidden;
         }
+
+        /* Animated background */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(232, 93, 4, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(46, 196, 182, 0.05) 0%, transparent 50%),
+                linear-gradient(180deg, var(--bg-primary) 0%, #0a0a0a 100%);
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.3;
+            mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px var(--accent-glow); }
+            50% { box-shadow: 0 0 20px var(--accent-glow), 0 0 30px var(--accent-glow); }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .stagger-1 { animation-delay: 0.1s; opacity: 0; }
+        .stagger-2 { animation-delay: 0.2s; opacity: 0; }
+        .stagger-3 { animation-delay: 0.3s; opacity: 0; }
+        .stagger-4 { animation-delay: 0.4s; opacity: 0; }
 
         /* Header */
         .header {
-            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
-            color: white;
-            padding: 1.5rem 2rem;
-            box-shadow: var(--shadow-lg);
+            padding: 2rem 3rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(13, 13, 13, 0.8);
+            backdrop-filter: blur(10px);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         .header-content {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -162,82 +239,83 @@ class ModernWebHandler(BaseHTTPRequestHandler):
 
         .logo {
             display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(255,255,255,0.2);
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
+            align-items: baseline;
+            gap: 1rem;
         }
 
         .logo h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
         }
 
-        .logo span {
-            font-size: 0.85rem;
-            opacity: 0.85;
-            font-weight: 400;
+        .logo h1 span {
+            color: var(--accent);
         }
 
-        .header-actions {
-            display: flex;
-            gap: 12px;
+        .logo-tag {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
 
         /* Main Layout */
         .main-layout {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 2rem 3rem;
             display: grid;
-            grid-template-columns: 280px 1fr 320px;
-            gap: 1.5rem;
+            grid-template-columns: 280px 1fr 340px;
+            gap: 2rem;
         }
 
         @media (max-width: 1200px) {
             .main-layout {
                 grid-template-columns: 1fr;
+                padding: 1.5rem;
             }
         }
 
         /* Cards */
         .card {
-            background: var(--white);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
             overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
         }
 
         .card:hover {
-            box-shadow: var(--shadow-lg);
+            border-color: var(--border-light);
         }
 
         .card-header {
             padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--light);
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
         .card-title {
+            font-family: var(--font-display);
             font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--dark);
+            font-weight: 500;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.75rem;
+        }
+
+        .card-title-icon {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
         .card-body {
@@ -249,210 +327,217 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 0.5rem;
             padding: 0.75rem 1.25rem;
-            font-size: 0.9rem;
+            font-family: var(--font-body);
+            font-size: 0.875rem;
             font-weight: 500;
-            border: none;
-            border-radius: var(--radius);
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             text-decoration: none;
-            white-space: nowrap;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: var(--accent);
             color: white;
+            border-color: var(--accent);
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            background: var(--accent-light);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-1px);
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
-            color: white;
+            background: transparent;
+            color: var(--text-primary);
+            border-color: var(--border-light);
         }
 
         .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            background: var(--bg-hover);
+            border-color: var(--text-muted);
         }
 
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
-            color: white;
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            padding: 0.5rem;
+        }
+
+        .btn-ghost:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
-            color: white;
+            background: transparent;
+            color: var(--danger);
+            border-color: var(--danger);
         }
 
         .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+            background: var(--danger);
+            color: white;
         }
 
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--gray-light);
-            color: var(--gray);
-        }
-
-        .btn-outline:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: rgba(99, 102, 241, 0.05);
+        .btn-success {
+            background: var(--success);
+            color: var(--bg-primary);
+            border-color: var(--success);
         }
 
         .btn-block {
             width: 100%;
         }
 
-        .btn-sm {
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-        }
-
-        .btn-icon {
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            border-radius: 8px;
-        }
-
         /* Action Menu */
         .action-menu {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 0.5rem;
         }
 
-        .action-btn {
+        .action-item {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 1rem;
             padding: 1rem;
-            background: var(--light);
-            border: none;
-            border-radius: var(--radius);
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             text-align: left;
-            font-size: 0.95rem;
-            color: var(--dark);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
         }
 
-        .action-btn:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateX(4px);
+        .action-item:hover {
+            background: var(--bg-hover);
+            border-color: var(--border);
+            color: var(--text-primary);
         }
 
-        .action-btn .icon {
-            width: 36px;
-            height: 36px;
-            background: var(--white);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .action-item:hover .action-icon {
+            color: var(--accent);
+        }
+
+        .action-icon {
             font-size: 1.1rem;
-            transition: all 0.2s;
-        }
-
-        .action-btn:hover .icon {
-            background: rgba(255,255,255,0.2);
+            transition: color 0.2s;
         }
 
         /* Task List */
         .task-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            max-height: 600px;
+            gap: 0.75rem;
+            max-height: 65vh;
             overflow-y: auto;
+            padding-right: 0.5rem;
         }
 
         .task-list::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
 
         .task-list::-webkit-scrollbar-track {
-            background: var(--light);
-            border-radius: 3px;
+            background: var(--bg-secondary);
         }
 
         .task-list::-webkit-scrollbar-thumb {
-            background: var(--gray-light);
-            border-radius: 3px;
+            background: var(--border-light);
+            border-radius: 2px;
         }
 
         .task-item {
-            background: var(--white);
-            border: 1px solid var(--light);
-            border-radius: var(--radius);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
             padding: 1rem 1.25rem;
-            transition: all 0.2s;
             cursor: pointer;
+            transition: all 0.2s ease;
             position: relative;
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        .task-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--accent);
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+            opacity: 0;
+            transition: opacity 0.2s;
         }
 
         .task-item:hover {
-            border-color: var(--primary-light);
-            box-shadow: var(--shadow);
-            transform: translateY(-2px);
+            border-color: var(--border-light);
+            background: var(--bg-tertiary);
         }
 
-        .task-item.selected {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        .task-item:hover::before {
+            opacity: 1;
         }
 
         .task-item.completed {
-            opacity: 0.7;
-            background: var(--light);
+            opacity: 0.5;
         }
 
         .task-item.completed .task-name {
             text-decoration: line-through;
-            color: var(--gray);
+            color: var(--text-muted);
+        }
+
+        .task-item.blocked {
+            border-color: var(--danger);
+            border-style: dashed;
+        }
+
+        .task-item.blocked::before {
+            background: var(--danger);
+            opacity: 0.5;
         }
 
         .task-header {
             display: flex;
-            align-items: flex-start;
             justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 8px;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
         }
 
         .task-name {
-            font-weight: 600;
-            color: var(--dark);
-            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.95rem;
         }
 
         .task-description {
             font-size: 0.85rem;
-            color: var(--gray);
-            margin-bottom: 12px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
             line-height: 1.5;
         }
 
         .task-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 0.5rem;
             align-items: center;
         }
 
         .task-actions {
             display: flex;
-            gap: 4px;
+            gap: 0.25rem;
             opacity: 0;
             transition: opacity 0.2s;
         }
@@ -465,100 +550,263 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         .badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
+            gap: 0.25rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
-        .badge-priority-5, .badge-priority-4 {
-            background: rgba(239, 68, 68, 0.1);
+        .badge-priority {
+            background: rgba(232, 93, 4, 0.15);
+            color: var(--accent-light);
+        }
+
+        .badge-priority.high {
+            background: rgba(230, 57, 70, 0.15);
             color: var(--danger);
         }
 
-        .badge-priority-3 {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning);
+        .badge-priority.low {
+            background: rgba(46, 196, 182, 0.15);
+            color: var(--success);
         }
 
-        .badge-priority-2, .badge-priority-1 {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--secondary);
+        .badge-status {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
         }
 
-        .badge-status-pendiente {
-            background: rgba(100, 116, 139, 0.1);
-            color: var(--gray);
+        .badge-status.active {
+            background: rgba(46, 196, 182, 0.15);
+            color: var(--success);
         }
 
-        .badge-status-en_progreso {
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--primary);
-        }
-
-        .badge-status-completada {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--secondary);
+        .badge-blocked {
+            background: rgba(230, 57, 70, 0.15);
+            color: var(--danger);
         }
 
         /* Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 1rem;
         }
 
-        .stat-card {
-            background: linear-gradient(135deg, var(--light) 0%, var(--white) 100%);
+        .stat-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
             padding: 1rem;
-            border-radius: var(--radius);
             text-align: center;
-            border: 1px solid var(--light);
+            transition: all 0.2s;
+        }
+
+        .stat-item:hover {
+            border-color: var(--accent);
         }
 
         .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--primary);
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 500;
+            color: var(--text-primary);
             line-height: 1;
-            margin-bottom: 4px;
         }
 
         .stat-label {
-            font-size: 0.75rem;
-            color: var(--gray);
+            font-size: 0.7rem;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.1em;
+            margin-top: 0.5rem;
         }
 
         /* Progress */
-        .progress-container {
+        .progress-section {
             margin-top: 1.5rem;
             padding-top: 1.5rem;
-            border-top: 1px solid var(--light);
+            border-top: 1px solid var(--border);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .progress-value {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            color: var(--accent);
         }
 
         .progress-bar {
-            width: 100%;
-            height: 12px;
-            background: var(--light);
-            border-radius: 6px;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
             overflow: hidden;
-            margin-bottom: 8px;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 6px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            border-radius: 3px;
             transition: width 0.5s ease;
         }
 
-        .progress-text {
+        /* Dependency Graph */
+        .graph-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            min-height: 300px;
+            position: relative;
+            overflow: auto;
+        }
+
+        .graph-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .graph-node {
+            position: absolute;
+            background: var(--bg-card);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            max-width: 150px;
             text-align: center;
-            font-weight: 600;
-            color: var(--primary);
+            z-index: 2;
+        }
+
+        .graph-node:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+            z-index: 3;
+        }
+
+        .graph-node.completed {
+            border-color: var(--success);
+            background: rgba(46, 196, 182, 0.1);
+        }
+
+        .graph-node.blocked {
+            border-color: var(--danger);
+            border-style: dashed;
+        }
+
+        .graph-node.executable {
+            border-color: var(--accent);
+            animation: glow 2s infinite;
+        }
+
+        .graph-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .graph-edge {
+            stroke: var(--border-light);
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+
+        /* Search & Filters */
+        .search-section {
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-left: 2.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-tab:hover {
+            border-color: var(--text-muted);
+            color: var(--text-secondary);
+        }
+
+        .filter-tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
         }
 
         /* Modal */
@@ -569,7 +817,7 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(4px);
             z-index: 1000;
             align-items: center;
@@ -582,51 +830,43 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         }
 
         .modal {
-            background: var(--white);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-xl);
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
             max-height: 90vh;
             overflow-y: auto;
-            animation: modalSlideIn 0.3s ease;
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            animation: fadeInUp 0.3s ease-out;
         }
 
         .modal-header {
             padding: 1.5rem;
-            border-bottom: 1px solid var(--light);
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
         .modal-title {
+            font-family: var(--font-display);
             font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--dark);
+            font-weight: 500;
         }
 
         .modal-close {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
             border: none;
-            background: var(--light);
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
             cursor: pointer;
-            font-size: 1.25rem;
-            color: var(--gray);
             transition: all 0.2s;
+            font-size: 1.25rem;
         }
 
         .modal-close:hover {
@@ -640,10 +880,10 @@ class ModernWebHandler(BaseHTTPRequestHandler):
 
         .modal-footer {
             padding: 1rem 1.5rem;
-            border-top: 1px solid var(--light);
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
+            gap: 0.75rem;
         }
 
         /* Forms */
@@ -653,26 +893,28 @@ class ModernWebHandler(BaseHTTPRequestHandler):
 
         .form-label {
             display: block;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 500;
-            color: var(--dark);
-            margin-bottom: 6px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
         }
 
         .form-input, .form-select, .form-textarea {
             width: 100%;
             padding: 0.75rem 1rem;
-            font-size: 0.95rem;
-            border: 2px solid var(--light);
-            border-radius: var(--radius);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: var(--text-primary);
             transition: all 0.2s;
-            font-family: inherit;
         }
 
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
         .form-textarea {
@@ -680,382 +922,350 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             min-height: 100px;
         }
 
+        .form-select {
+            cursor: pointer;
+        }
+
         /* Alerts */
-        .alert-container {
+        .toast-container {
             position: fixed;
-            top: 100px;
-            right: 20px;
+            bottom: 2rem;
+            right: 2rem;
             z-index: 2000;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 0.75rem;
         }
 
-        .alert {
+        .toast {
             padding: 1rem 1.5rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
             display: flex;
             align-items: center;
-            gap: 12px;
-            animation: alertSlideIn 0.3s ease;
-            min-width: 300px;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease-out;
+            min-width: 280px;
         }
 
-        @keyframes alertSlideIn {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .toast-success {
+            border-color: var(--success);
         }
 
-        .alert-success {
-            background: var(--secondary);
-            color: white;
+        .toast-success .toast-icon {
+            color: var(--success);
         }
 
-        .alert-error {
-            background: var(--danger);
-            color: white;
+        .toast-error {
+            border-color: var(--danger);
         }
 
-        .alert-info {
-            background: var(--primary);
-            color: white;
+        .toast-error .toast-icon {
+            color: var(--danger);
         }
 
-        /* Dependency Graph */
-        .dependency-item {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem;
-            background: var(--light);
-            border-radius: var(--radius);
-            margin-bottom: 8px;
-            gap: 12px;
+        .toast-icon {
+            font-size: 1.1rem;
         }
 
-        .dependency-arrow {
-            color: var(--primary);
-            font-size: 1.25rem;
-        }
-
-        .dependency-task {
-            flex: 1;
+        .toast-message {
             font-size: 0.9rem;
-        }
-
-        /* Filter Tabs */
-        .filter-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-tab {
-            padding: 0.5rem 1rem;
-            border: none;
-            background: var(--light);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--gray);
-        }
-
-        .filter-tab:hover {
-            background: var(--primary-light);
-            color: white;
-        }
-
-        .filter-tab.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Search */
-        .search-box {
-            position: relative;
-            margin-bottom: 1rem;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.75rem 1rem 0.75rem 2.75rem;
-            border: 2px solid var(--light);
-            border-radius: var(--radius);
-            font-size: 0.95rem;
-            transition: all 0.2s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-light);
+            color: var(--text-primary);
         }
 
         /* Empty State */
         .empty-state {
             text-align: center;
             padding: 3rem 1rem;
-            color: var(--gray);
         }
 
         .empty-state-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
+            opacity: 0.3;
         }
 
         .empty-state-text {
-            font-size: 1rem;
+            color: var(--text-muted);
             margin-bottom: 1.5rem;
         }
 
-        /* Tooltip */
-        .tooltip {
-            position: relative;
-        }
-
-        .tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 6px 12px;
-            background: var(--dark);
-            color: white;
-            font-size: 0.75rem;
-            border-radius: 6px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-        }
-
-        .tooltip:hover::after {
-            opacity: 1;
-        }
-
-        /* Loading */
-        .loading {
+        /* Dependency Visualization */
+        .dep-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 2rem;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.5rem;
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--light);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .dep-arrow {
+            color: var(--accent);
+            font-size: 1.25rem;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .dep-task {
+            flex: 1;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .dep-task.source {
+            color: var(--text-primary);
         }
 
         /* Info Panel */
         .info-panel {
-            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            margin-bottom: 1rem;
+            background: linear-gradient(135deg, rgba(232, 93, 4, 0.1) 0%, transparent 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            margin-top: 1rem;
         }
 
-        .info-panel h3 {
-            font-size: 1rem;
+        .info-panel h4 {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--accent);
             margin-bottom: 0.5rem;
         }
 
         .info-panel p {
-            font-size: 0.85rem;
-            opacity: 0.9;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.6;
         }
 
         /* Footer */
         .footer {
             text-align: center;
-            padding: 1.5rem;
-            background: var(--dark);
-            color: white;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
             margin-top: 2rem;
         }
 
         .footer p {
-            font-size: 0.9rem;
-            opacity: 0.8;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .footer strong {
+            color: var(--text-secondary);
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">📋</div>
-                    <div>
-                        <h1>Gestor de Tareas</h1>
-                        <span>Sistema de Dependencias con Grafos</span>
-                    </div>
+    <div class="bg-pattern"></div>
+    <div class="bg-grid"></div>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>Task<span>Flow</span></h1>
+                <span class="logo-tag">Dependency Manager</span>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('createTaskModal')">
+                + Nueva Tarea
+            </button>
+        </div>
+    </header>
+
+    <main class="main-layout">
+        <!-- Sidebar Actions -->
+        <aside class="animate-in stagger-1">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="card-title-icon"></span>
+                        Acciones
+                    </h2>
                 </div>
-                <div class="header-actions">
-                    <button class="btn btn-primary" onclick="openModal('createTaskModal')">
-                        <span>+</span> Nueva Tarea
-                    </button>
+                <div class="card-body">
+                    <div class="action-menu">
+                        <button class="action-item" onclick="openModal('createTaskModal')">
+                            <span class="action-icon">+</span>
+                            <span>Crear Tarea</span>
+                        </button>
+                        <button class="action-item" onclick="openModal('dependencyModal')">
+                            <span class="action-icon">&#8594;</span>
+                            <span>Nueva Dependencia</span>
+                        </button>
+                        <button class="action-item" onclick="viewExecutionOrder()">
+                            <span class="action-icon">&#9776;</span>
+                            <span>Orden Topologico</span>
+                        </button>
+                        <button class="action-item" onclick="viewExecutableTasks()">
+                            <span class="action-icon">&#10003;</span>
+                            <span>Tareas Disponibles</span>
+                        </button>
+                        <button class="action-item" onclick="viewNextTask()">
+                            <span class="action-icon">&#9733;</span>
+                            <span>Siguiente Tarea</span>
+                        </button>
+                        <button class="action-item" onclick="refreshData()">
+                            <span class="action-icon">&#8635;</span>
+                            <span>Actualizar</span>
+                        </button>
+                    </div>
+
+                    <div class="info-panel">
+                        <h4>Estructuras de Datos</h4>
+                        <p>Grafo Dirigido Aciclico (DAG) para dependencias. Ordenamiento topologico con algoritmo de Kahn. Cola FIFO para plan diario.</p>
+                    </div>
                 </div>
             </div>
-        </header>
+        </aside>
 
-        <main class="main-layout">
-            <!-- Sidebar - Acciones -->
-            <aside>
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <span>🎯</span> Acciones
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="action-menu">
-                            <button class="action-btn" onclick="openModal('createTaskModal')">
-                                <span class="icon">➕</span>
-                                <span>Crear Tarea</span>
-                            </button>
-                            <button class="action-btn" onclick="openModal('dependencyModal')">
-                                <span class="icon">🔗</span>
-                                <span>Agregar Dependencia</span>
-                            </button>
-                            <button class="action-btn" onclick="viewExecutionOrder()">
-                                <span class="icon">📊</span>
-                                <span>Orden de Ejecucion</span>
-                            </button>
-                            <button class="action-btn" onclick="viewExecutableTasks()">
-                                <span class="icon">🎯</span>
-                                <span>Tareas Ejecutables</span>
-                            </button>
-                            <button class="action-btn" onclick="viewNextTask()">
-                                <span class="icon">⭐</span>
-                                <span>Siguiente Tarea</span>
-                            </button>
-                            <button class="action-btn" onclick="openModal('viewDependenciesModal')">
-                                <span class="icon">🕸️</span>
-                                <span>Ver Dependencias</span>
-                            </button>
-                            <button class="action-btn" onclick="refreshData()">
-                                <span class="icon">🔄</span>
-                                <span>Actualizar</span>
-                            </button>
-                        </div>
-                    </div>
+        <!-- Main Content -->
+        <section class="animate-in stagger-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="card-title-icon"></span>
+                        Tareas
+                    </h2>
+                    <span id="taskCount" class="badge badge-status">0</span>
                 </div>
-
-                <div class="info-panel" style="margin-top: 1rem;">
-                    <h3>💡 Estructuras de Datos</h3>
-                    <p>Este sistema utiliza <strong>Grafos Dirigidos Aciclicos (DAG)</strong> para dependencias y <strong>Colas (Queue)</strong> para el plan diario.</p>
-                </div>
-            </aside>
-
-            <!-- Main Content - Lista de Tareas -->
-            <section>
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <span>📋</span> Mis Tareas
-                        </h2>
-                        <span id="taskCount" class="badge badge-status-pendiente">0 tareas</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="search-box">
-                            <span class="search-icon">🔍</span>
+                <div class="card-body">
+                    <div class="search-section">
+                        <div class="search-wrapper">
+                            <span class="search-icon">&#128269;</span>
                             <input type="text" class="search-input" id="searchInput" placeholder="Buscar tareas..." oninput="filterTasks()">
                         </div>
-                        
-                        <div class="filter-tabs">
-                            <button class="filter-tab active" data-filter="all" onclick="setFilter('all')">Todas</button>
-                            <button class="filter-tab" data-filter="pendiente" onclick="setFilter('pendiente')">Pendientes</button>
-                            <button class="filter-tab" data-filter="en_progreso" onclick="setFilter('en_progreso')">En Progreso</button>
-                            <button class="filter-tab" data-filter="completada" onclick="setFilter('completada')">Completadas</button>
-                        </div>
-
-                        <div id="taskList" class="task-list">
-                            <div class="loading"><div class="spinner"></div></div>
-                        </div>
                     </div>
-                </div>
-            </section>
-
-            <!-- Sidebar - Estadisticas -->
-            <aside>
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <span>📈</span> Estadisticas
-                        </h2>
+                    
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all" onclick="setFilter('all')">Todas</button>
+                        <button class="filter-tab" data-filter="pendiente" onclick="setFilter('pendiente')">Pendientes</button>
+                        <button class="filter-tab" data-filter="en_progreso" onclick="setFilter('en_progreso')">En Progreso</button>
+                        <button class="filter-tab" data-filter="completada" onclick="setFilter('completada')">Completadas</button>
+                        <button class="filter-tab" data-filter="blocked" onclick="setFilter('blocked')">Bloqueadas</button>
                     </div>
-                    <div class="card-body">
-                        <div id="statsContainer">
-                            <div class="loading"><div class="spinner"></div></div>
+
+                    <div id="taskList" class="task-list">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">&#128203;</div>
+                            <p class="empty-state-text">Cargando tareas...</p>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="card" style="margin-top: 1rem;">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <span>📅</span> Plan Diario
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div id="dailyPlan">
-                            <p style="color: var(--gray); font-size: 0.9rem;">Agrega tareas ejecutables al plan diario.</p>
+            <!-- Dependency Graph -->
+            <div class="card" style="margin-top: 1.5rem;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="card-title-icon"></span>
+                        Grafo de Dependencias
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div id="graphContainer" class="graph-container">
+                        <svg class="graph-svg" id="graphSvg">
+                            <defs>
+                                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#e85d04" />
+                                </marker>
+                            </defs>
+                        </svg>
+                        <div class="graph-empty">
+                            <p>Agrega tareas y dependencias para visualizar el grafo</p>
                         </div>
                     </div>
                 </div>
-            </aside>
-        </main>
+            </div>
+        </section>
 
-        <footer class="footer">
-            <p>Universidad Don Bosco - Programacion con Estructuras de Datos</p>
-            <p>Sistema de Gestion de Tareas con Dependencias - Fase 2</p>
-        </footer>
-    </div>
+        <!-- Sidebar Stats -->
+        <aside class="animate-in stagger-3">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="card-title-icon"></span>
+                        Estadisticas
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div id="statsContainer">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value">-</div>
+                                <div class="stat-label">Total</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">-</div>
+                                <div class="stat-label">Completadas</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">-</div>
+                                <div class="stat-label">Pendientes</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">-</div>
+                                <div class="stat-label">Ejecutables</div>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <span class="progress-label">Progreso</span>
+                                <span class="progress-value" id="progressValue">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Alert Container -->
-    <div id="alertContainer" class="alert-container"></div>
+            <!-- Dependencies List -->
+            <div class="card" style="margin-top: 1.5rem;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="card-title-icon"></span>
+                        Dependencias
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div id="dependenciesList" style="max-height: 300px; overflow-y: auto;">
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Sin dependencias</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
 
-    <!-- Modal: Crear Tarea -->
+    <footer class="footer">
+        <p><strong>Universidad Don Bosco</strong> &mdash; Programacion con Estructuras de Datos</p>
+        <p>Sistema de Gestion de Tareas con Dependencias &mdash; Fase 2</p>
+    </footer>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Modals -->
+    <!-- Create Task Modal -->
     <div id="createTaskModal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h3 class="modal-title">➕ Crear Nueva Tarea</h3>
+                <h3 class="modal-title">Nueva Tarea</h3>
                 <button class="modal-close" onclick="closeModal('createTaskModal')">&times;</button>
             </div>
             <form id="createTaskForm" onsubmit="createTask(event)">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Nombre de la tarea *</label>
-                        <input type="text" class="form-input" id="taskName" required placeholder="Ej: Disenar base de datos">
+                        <label class="form-label">Nombre *</label>
+                        <input type="text" class="form-input" id="taskName" required placeholder="Nombre de la tarea">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Descripcion</label>
-                        <textarea class="form-textarea" id="taskDescription" placeholder="Describe la tarea..."></textarea>
+                        <textarea class="form-textarea" id="taskDescription" placeholder="Descripcion opcional..."></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Prioridad</label>
@@ -1067,31 +1277,27 @@ class ModernWebHandler(BaseHTTPRequestHandler):
                             <option value="5">5 - Muy Alta</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Fecha limite (opcional)</label>
-                        <input type="date" class="form-input" id="taskDeadline">
-                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="closeModal('createTaskModal')">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Crear Tarea</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('createTaskModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Editar Tarea -->
+    <!-- Edit Task Modal -->
     <div id="editTaskModal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h3 class="modal-title">✏️ Editar Tarea</h3>
+                <h3 class="modal-title">Editar Tarea</h3>
                 <button class="modal-close" onclick="closeModal('editTaskModal')">&times;</button>
             </div>
             <form id="editTaskForm" onsubmit="updateTask(event)">
                 <div class="modal-body">
                     <input type="hidden" id="editTaskId">
                     <div class="form-group">
-                        <label class="form-label">Nombre de la tarea *</label>
+                        <label class="form-label">Nombre *</label>
                         <input type="text" class="form-input" id="editTaskName" required>
                     </div>
                     <div class="form-group">
@@ -1118,68 +1324,50 @@ class ModernWebHandler(BaseHTTPRequestHandler):
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="closeModal('editTaskModal')">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editTaskModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Agregar Dependencia -->
+    <!-- Dependency Modal -->
     <div id="dependencyModal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h3 class="modal-title">🔗 Agregar Dependencia</h3>
+                <h3 class="modal-title">Nueva Dependencia</h3>
                 <button class="modal-close" onclick="closeModal('dependencyModal')">&times;</button>
             </div>
             <form id="dependencyForm" onsubmit="addDependency(event)">
                 <div class="modal-body">
-                    <p style="color: var(--gray); margin-bottom: 1rem; font-size: 0.9rem;">
-                        Define que una tarea debe completarse antes de otra. El sistema detectara automaticamente ciclos invalidos.
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+                        La tarea dependiente no podra completarse hasta que la tarea prerequisito este completada.
                     </p>
                     <div class="form-group">
                         <label class="form-label">Tarea Prerequisito (debe completarse primero)</label>
                         <select class="form-select" id="depPrerequisite" required>
-                            <option value="">Selecciona una tarea...</option>
+                            <option value="">Seleccionar...</option>
                         </select>
                     </div>
-                    <div style="text-align: center; color: var(--primary); font-size: 1.5rem; margin: 0.5rem 0;">
-                        ⬇️
+                    <div style="text-align: center; color: var(--accent); font-size: 1.5rem; margin: 0.5rem 0;">
+                        &#8595;
                     </div>
                     <div class="form-group">
                         <label class="form-label">Tarea Dependiente (se desbloquea despues)</label>
                         <select class="form-select" id="depDependent" required>
-                            <option value="">Selecciona una tarea...</option>
+                            <option value="">Seleccionar...</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="closeModal('dependencyModal')">Cancelar</button>
-                    <button type="submit" class="btn btn-secondary">Agregar Dependencia</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('dependencyModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Ver Dependencias -->
-    <div id="viewDependenciesModal" class="modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title">🕸️ Grafo de Dependencias</h3>
-                <button class="modal-close" onclick="closeModal('viewDependenciesModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div id="dependenciesList">
-                    <div class="loading"><div class="spinner"></div></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline" onclick="closeModal('viewDependenciesModal')">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Resultado de Orden -->
+    <!-- Result Modal -->
     <div id="resultModal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
@@ -1190,56 +1378,58 @@ class ModernWebHandler(BaseHTTPRequestHandler):
                 <div id="resultModalContent"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="closeModal('resultModal')">Entendido</button>
+                <button type="button" class="btn btn-primary" onclick="closeModal('resultModal')">Cerrar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal: Confirmar Eliminacion -->
-    <div id="deleteConfirmModal" class="modal-overlay">
+    <!-- Delete Confirm Modal -->
+    <div id="deleteModal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h3 class="modal-title">⚠️ Confirmar Eliminacion</h3>
-                <button class="modal-close" onclick="closeModal('deleteConfirmModal')">&times;</button>
+                <h3 class="modal-title">Eliminar Tarea</h3>
+                <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <p>¿Estas seguro de que deseas eliminar esta tarea? Esta accion no se puede deshacer.</p>
-                <p id="deleteTaskName" style="font-weight: 600; margin-top: 1rem; color: var(--danger);"></p>
+                <p style="color: var(--text-secondary);">Esta accion no se puede deshacer.</p>
+                <p id="deleteTaskName" style="font-weight: 600; color: var(--danger); margin-top: 1rem;"></p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline" onclick="closeModal('deleteConfirmModal')">Cancelar</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancelar</button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Estado global de la aplicacion
+        // State
         let tasks = [];
+        let dependencies = [];
+        let executableTaskIds = new Set();
         let currentFilter = 'all';
-        let taskToDelete = null;
 
-        // Funciones de utilidad
-        function showAlert(message, type = 'success') {
-            const container = document.getElementById('alertContainer');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</span> ${message}`;
-            container.appendChild(alert);
-            
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon">${type === 'success' ? '&#10003;' : '&#10007;'}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            container.appendChild(toast);
             setTimeout(() => {
-                alert.style.animation = 'alertSlideIn 0.3s ease reverse';
-                setTimeout(() => alert.remove(), 300);
-            }, 4000);
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
         }
 
+        // Modal functions
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('active');
-            
             if (modalId === 'dependencyModal') {
                 populateDependencySelects();
-            } else if (modalId === 'viewDependenciesModal') {
-                loadDependencies();
             }
         }
 
@@ -1247,29 +1437,24 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             document.getElementById(modalId).classList.remove('active');
         }
 
-        // API calls
+        // API
         async function apiCall(endpoint, method = 'GET', data = null) {
             try {
-                const options = {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json' }
-                };
-                if (data && method !== 'GET') {
-                    options.body = JSON.stringify(data);
-                }
+                const options = { method, headers: { 'Content-Type': 'application/json' } };
+                if (data && method !== 'GET') options.body = JSON.stringify(data);
                 const response = await fetch('/api/' + endpoint, options);
                 return await response.json();
             } catch (error) {
                 console.error('API Error:', error);
-                showAlert('Error de conexion con el servidor', 'error');
+                showToast('Error de conexion', 'error');
                 return null;
             }
         }
 
-        // Cargar datos
+        // Data loading
         async function loadTasks() {
             const response = await apiCall('tasks');
-            if (response && response.success) {
+            if (response?.success) {
                 tasks = response.data;
                 renderTasks();
                 updateTaskCount();
@@ -1278,144 +1463,306 @@ class ModernWebHandler(BaseHTTPRequestHandler):
 
         async function loadStatistics() {
             const response = await apiCall('statistics');
-            if (response && response.success) {
+            if (response?.success) {
                 renderStatistics(response.data);
             }
         }
 
-        async function loadDailyPlan() {
-            const response = await apiCall('daily-plan');
-            if (response && response.success) {
-                renderDailyPlan(response.data);
+        async function loadDependencies() {
+            const response = await apiCall('dependencies');
+            if (response?.success) {
+                dependencies = response.data;
+                renderDependencies();
+                renderGraph();
             }
         }
 
-        function refreshData() {
-            loadTasks();
-            loadStatistics();
-            loadDailyPlan();
-            showAlert('Datos actualizados', 'info');
+        async function loadExecutableTasks() {
+            const response = await apiCall('executable-tasks');
+            if (response?.success) {
+                executableTaskIds = new Set(response.data.map(t => t.id));
+            }
         }
 
-        // Renderizado
+        async function refreshData() {
+            await Promise.all([loadTasks(), loadStatistics(), loadDependencies(), loadExecutableTasks()]);
+            renderTasks();
+            renderGraph();
+            showToast('Datos actualizados');
+        }
+
+        // Check if task can be completed (all dependencies completed)
+        function canCompleteTask(taskId) {
+            const taskDeps = dependencies.filter(d => d.destino === taskId);
+            for (const dep of taskDeps) {
+                const prereq = tasks.find(t => t.id === dep.origen);
+                if (prereq && prereq.estado !== 'completada') {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function getBlockingTasks(taskId) {
+            const blocking = [];
+            const taskDeps = dependencies.filter(d => d.destino === taskId);
+            for (const dep of taskDeps) {
+                const prereq = tasks.find(t => t.id === dep.origen);
+                if (prereq && prereq.estado !== 'completada') {
+                    blocking.push(prereq.nombre);
+                }
+            }
+            return blocking;
+        }
+
+        // Rendering
         function renderTasks() {
             const container = document.getElementById('taskList');
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             
-            let filteredTasks = tasks.filter(task => {
-                const matchesFilter = currentFilter === 'all' || task.estado === currentFilter;
+            let filtered = tasks.filter(task => {
                 const matchesSearch = task.nombre.toLowerCase().includes(searchTerm) || 
-                                     (task.descripcion && task.descripcion.toLowerCase().includes(searchTerm));
-                return matchesFilter && matchesSearch;
+                                     (task.descripcion?.toLowerCase().includes(searchTerm));
+                if (!matchesSearch) return false;
+                
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'blocked') {
+                    return task.estado !== 'completada' && !canCompleteTask(task.id);
+                }
+                return task.estado === currentFilter;
             });
 
-            filteredTasks.sort((a, b) => b.prioridad - a.prioridad);
+            filtered.sort((a, b) => b.prioridad - a.prioridad);
 
-            if (filteredTasks.length === 0) {
+            if (filtered.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">📭</div>
-                        <p class="empty-state-text">No hay tareas ${currentFilter !== 'all' ? 'con este filtro' : 'registradas'}</p>
-                        <button class="btn btn-primary" onclick="openModal('createTaskModal')">Crear Primera Tarea</button>
+                        <div class="empty-state-icon">&#128203;</div>
+                        <p class="empty-state-text">No hay tareas</p>
+                        <button class="btn btn-primary" onclick="openModal('createTaskModal')">Crear tarea</button>
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = filteredTasks.map(task => `
-                <div class="task-item ${task.estado === 'completada' ? 'completed' : ''}" onclick="selectTask(${task.id})">
-                    <div class="task-header">
-                        <span class="task-name">${escapeHtml(task.nombre)}</span>
-                        <div class="task-actions">
-                            ${task.estado !== 'completada' ? `
-                                <button class="btn btn-icon btn-secondary tooltip" data-tooltip="Completar" onclick="event.stopPropagation(); completeTask(${task.id})">✓</button>
-                            ` : ''}
-                            <button class="btn btn-icon btn-outline tooltip" data-tooltip="Editar" onclick="event.stopPropagation(); openEditModal(${task.id})">✏️</button>
-                            <button class="btn btn-icon btn-danger tooltip" data-tooltip="Eliminar" onclick="event.stopPropagation(); confirmDelete(${task.id})">🗑️</button>
+            container.innerHTML = filtered.map((task, index) => {
+                const isBlocked = task.estado !== 'completada' && !canCompleteTask(task.id);
+                const blockingTasks = isBlocked ? getBlockingTasks(task.id) : [];
+                const isExecutable = executableTaskIds.has(task.id);
+                
+                let priorityClass = '';
+                if (task.prioridad >= 4) priorityClass = 'high';
+                else if (task.prioridad <= 2) priorityClass = 'low';
+
+                return `
+                    <div class="task-item ${task.estado === 'completada' ? 'completed' : ''} ${isBlocked ? 'blocked' : ''}" 
+                         style="animation-delay: ${index * 0.05}s">
+                        <div class="task-header">
+                            <span class="task-name">${escapeHtml(task.nombre)}</span>
+                            <div class="task-actions">
+                                ${task.estado !== 'completada' ? `
+                                    <button class="btn btn-ghost" onclick="event.stopPropagation(); tryCompleteTask(${task.id})" title="Completar">&#10003;</button>
+                                ` : ''}
+                                <button class="btn btn-ghost" onclick="event.stopPropagation(); openEditModal(${task.id})" title="Editar">&#9998;</button>
+                                <button class="btn btn-ghost" onclick="event.stopPropagation(); confirmDelete(${task.id})" title="Eliminar">&#128465;</button>
+                            </div>
+                        </div>
+                        ${task.descripcion ? `<p class="task-description">${escapeHtml(task.descripcion)}</p>` : ''}
+                        <div class="task-meta">
+                            <span class="badge badge-priority ${priorityClass}">P${task.prioridad}</span>
+                            <span class="badge badge-status ${task.estado === 'completada' ? 'active' : ''}">${formatStatus(task.estado)}</span>
+                            ${isBlocked ? `<span class="badge badge-blocked" title="Bloqueada por: ${blockingTasks.join(', ')}">Bloqueada</span>` : ''}
+                            ${isExecutable && task.estado !== 'completada' ? `<span class="badge badge-status active">Ejecutable</span>` : ''}
                         </div>
                     </div>
-                    ${task.descripcion ? `<p class="task-description">${escapeHtml(task.descripcion)}</p>` : ''}
-                    <div class="task-meta">
-                        <span class="badge badge-status-${task.estado}">${formatStatus(task.estado)}</span>
-                        <span class="badge badge-priority-${task.prioridad}">⭐ ${task.prioridad}</span>
-                        ${task.fecha_limite ? `<span class="badge badge-status-pendiente">📅 ${formatDate(task.fecha_limite)}</span>` : ''}
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function renderStatistics(stats) {
             const container = document.getElementById('statsContainer');
             container.innerHTML = `
                 <div class="stats-grid">
-                    <div class="stat-card">
+                    <div class="stat-item">
                         <div class="stat-value">${stats.total_tareas}</div>
                         <div class="stat-label">Total</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-item">
                         <div class="stat-value">${stats.completadas}</div>
                         <div class="stat-label">Completadas</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-item">
                         <div class="stat-value">${stats.pendientes}</div>
                         <div class="stat-label">Pendientes</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-item">
                         <div class="stat-value">${stats.ejecutables}</div>
                         <div class="stat-label">Ejecutables</div>
                     </div>
                 </div>
-                <div class="progress-container">
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-label">Progreso</span>
+                        <span class="progress-value">${stats.porcentaje_completado.toFixed(0)}%</span>
+                    </div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: ${stats.porcentaje_completado}%"></div>
                     </div>
-                    <div class="progress-text">${stats.porcentaje_completado.toFixed(1)}% Completado</div>
                 </div>
             `;
         }
 
-        function renderDailyPlan(planTasks) {
-            const container = document.getElementById('dailyPlan');
-            if (!planTasks || planTasks.length === 0) {
-                container.innerHTML = '<p style="color: var(--gray); font-size: 0.9rem;">No hay tareas en el plan diario.</p>';
+        function renderDependencies() {
+            const container = document.getElementById('dependenciesList');
+            if (dependencies.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">Sin dependencias definidas</p>';
                 return;
             }
-            container.innerHTML = planTasks.map((task, index) => `
-                <div class="dependency-item">
-                    <span>${index + 1}.</span>
-                    <span class="dependency-task">${escapeHtml(task.nombre)}</span>
+            container.innerHTML = dependencies.map(dep => `
+                <div class="dep-item">
+                    <span class="dep-task source">${escapeHtml(dep.origen_nombre)}</span>
+                    <span class="dep-arrow">&#8594;</span>
+                    <span class="dep-task">${escapeHtml(dep.destino_nombre)}</span>
+                    <button class="btn btn-ghost" onclick="removeDependency(${dep.origen}, ${dep.destino})" title="Eliminar">&#10007;</button>
                 </div>
             `).join('');
         }
 
-        // Acciones de tareas
+        function renderGraph() {
+            const container = document.getElementById('graphContainer');
+            const svg = document.getElementById('graphSvg');
+            
+            // Clear existing nodes (keep svg)
+            container.querySelectorAll('.graph-node').forEach(n => n.remove());
+            svg.innerHTML = `<defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#e85d04" />
+                </marker>
+            </defs>`;
+
+            if (tasks.length === 0) {
+                container.querySelector('.graph-empty').style.display = 'flex';
+                return;
+            }
+            container.querySelector('.graph-empty').style.display = 'none';
+
+            // Calculate positions using simple layout
+            const nodePositions = {};
+            const containerWidth = container.clientWidth - 40;
+            const containerHeight = Math.max(300, tasks.length * 50);
+            container.style.height = containerHeight + 'px';
+
+            // Group tasks by dependency level
+            const levels = {};
+            const taskLevels = {};
+            
+            // Calculate level for each task (0 = no dependencies)
+            function getLevel(taskId, visited = new Set()) {
+                if (visited.has(taskId)) return 0;
+                visited.add(taskId);
+                
+                const deps = dependencies.filter(d => d.destino === taskId);
+                if (deps.length === 0) return 0;
+                
+                let maxLevel = 0;
+                for (const dep of deps) {
+                    maxLevel = Math.max(maxLevel, getLevel(dep.origen, visited) + 1);
+                }
+                return maxLevel;
+            }
+
+            tasks.forEach(task => {
+                const level = getLevel(task.id);
+                taskLevels[task.id] = level;
+                if (!levels[level]) levels[level] = [];
+                levels[level].push(task);
+            });
+
+            const maxLevel = Math.max(...Object.keys(levels).map(Number), 0);
+            const levelWidth = containerWidth / (maxLevel + 1);
+
+            // Position nodes
+            Object.entries(levels).forEach(([level, levelTasks]) => {
+                const x = parseInt(level) * levelWidth + 20;
+                const yStep = (containerHeight - 40) / (levelTasks.length + 1);
+                
+                levelTasks.forEach((task, idx) => {
+                    nodePositions[task.id] = {
+                        x: x,
+                        y: (idx + 1) * yStep
+                    };
+                });
+            });
+
+            // Draw edges first
+            dependencies.forEach(dep => {
+                const from = nodePositions[dep.origen];
+                const to = nodePositions[dep.destino];
+                if (from && to) {
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    const midX = (from.x + to.x) / 2;
+                    path.setAttribute('d', `M ${from.x + 75} ${from.y + 20} Q ${midX} ${from.y + 20}, ${midX} ${(from.y + to.y) / 2 + 20} T ${to.x} ${to.y + 20}`);
+                    path.setAttribute('class', 'graph-edge');
+                    svg.appendChild(path);
+                }
+            });
+
+            // Draw nodes
+            tasks.forEach(task => {
+                const pos = nodePositions[task.id];
+                if (!pos) return;
+
+                const isBlocked = task.estado !== 'completada' && !canCompleteTask(task.id);
+                const isExecutable = executableTaskIds.has(task.id) && task.estado !== 'completada';
+
+                const node = document.createElement('div');
+                node.className = `graph-node ${task.estado === 'completada' ? 'completed' : ''} ${isBlocked ? 'blocked' : ''} ${isExecutable ? 'executable' : ''}`;
+                node.style.left = pos.x + 'px';
+                node.style.top = pos.y + 'px';
+                node.textContent = task.nombre.length > 20 ? task.nombre.substring(0, 17) + '...' : task.nombre;
+                node.title = task.nombre;
+                node.onclick = () => openEditModal(task.id);
+                container.appendChild(node);
+            });
+        }
+
+        // Task actions
         async function createTask(event) {
             event.preventDefault();
             const data = {
                 nombre: document.getElementById('taskName').value,
                 descripcion: document.getElementById('taskDescription').value,
-                prioridad: parseInt(document.getElementById('taskPriority').value),
-                fecha_limite: document.getElementById('taskDeadline').value || null
+                prioridad: parseInt(document.getElementById('taskPriority').value)
             };
             
             const response = await apiCall('tasks', 'POST', data);
-            if (response && response.success) {
-                showAlert('Tarea creada exitosamente');
+            if (response?.success) {
+                showToast('Tarea creada');
                 closeModal('createTaskModal');
                 document.getElementById('createTaskForm').reset();
                 refreshData();
             } else {
-                showAlert(response?.error || 'Error al crear tarea', 'error');
+                showToast(response?.error || 'Error al crear', 'error');
             }
         }
 
-        async function completeTask(taskId) {
+        async function tryCompleteTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            // Check dependencies
+            if (!canCompleteTask(taskId)) {
+                const blocking = getBlockingTasks(taskId);
+                showToast(`No se puede completar. Primero completa: ${blocking.join(', ')}`, 'error');
+                return;
+            }
+
             const response = await apiCall(`tasks/${taskId}/complete`, 'POST');
-            if (response && response.success) {
-                showAlert(response.message);
+            if (response?.success) {
+                showToast(response.message);
                 refreshData();
             } else {
-                showAlert(response?.error || 'Error al completar tarea', 'error');
+                showToast(response?.error || 'Error', 'error');
             }
         }
 
@@ -1443,12 +1790,12 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             };
             
             const response = await apiCall(`tasks/${taskId}`, 'PUT', data);
-            if (response && response.success) {
-                showAlert('Tarea actualizada exitosamente');
+            if (response?.success) {
+                showToast('Tarea actualizada');
                 closeModal('editTaskModal');
                 refreshData();
             } else {
-                showAlert(response?.error || 'Error al actualizar tarea', 'error');
+                showToast(response?.error || 'Error', 'error');
             }
         }
 
@@ -1456,29 +1803,28 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             const task = tasks.find(t => t.id === taskId);
             if (!task) return;
             
-            taskToDelete = taskId;
             document.getElementById('deleteTaskName').textContent = task.nombre;
             document.getElementById('confirmDeleteBtn').onclick = () => deleteTask(taskId);
-            openModal('deleteConfirmModal');
+            openModal('deleteModal');
         }
 
         async function deleteTask(taskId) {
             const response = await apiCall(`tasks/${taskId}`, 'DELETE');
-            if (response && response.success) {
-                showAlert('Tarea eliminada');
-                closeModal('deleteConfirmModal');
+            if (response?.success) {
+                showToast('Tarea eliminada');
+                closeModal('deleteModal');
                 refreshData();
             } else {
-                showAlert(response?.error || 'Error al eliminar tarea', 'error');
+                showToast(response?.error || 'Error', 'error');
             }
         }
 
-        // Dependencias
+        // Dependencies
         function populateDependencySelects() {
-            const pendingTasks = tasks.filter(t => t.estado !== 'completada');
-            const options = pendingTasks.map(t => `<option value="${t.id}">${escapeHtml(t.nombre)}</option>`).join('');
-            document.getElementById('depPrerequisite').innerHTML = '<option value="">Selecciona una tarea...</option>' + options;
-            document.getElementById('depDependent').innerHTML = '<option value="">Selecciona una tarea...</option>' + options;
+            const pending = tasks.filter(t => t.estado !== 'completada');
+            const options = pending.map(t => `<option value="${t.id}">${escapeHtml(t.nombre)}</option>`).join('');
+            document.getElementById('depPrerequisite').innerHTML = '<option value="">Seleccionar...</option>' + options;
+            document.getElementById('depDependent').innerHTML = '<option value="">Seleccionar...</option>' + options;
         }
 
         async function addDependency(event) {
@@ -1487,100 +1833,83 @@ class ModernWebHandler(BaseHTTPRequestHandler):
             const destino = parseInt(document.getElementById('depDependent').value);
             
             if (origen === destino) {
-                showAlert('Una tarea no puede depender de si misma', 'error');
+                showToast('Una tarea no puede depender de si misma', 'error');
                 return;
             }
             
             const response = await apiCall('dependencies', 'POST', { origen, destino });
-            if (response && response.success) {
-                showAlert('Dependencia agregada exitosamente');
+            if (response?.success) {
+                showToast('Dependencia agregada');
                 closeModal('dependencyModal');
                 refreshData();
             } else {
-                showAlert(response?.error || 'Error al agregar dependencia', 'error');
-            }
-        }
-
-        async function loadDependencies() {
-            const container = document.getElementById('dependenciesList');
-            const response = await apiCall('dependencies');
-            
-            if (response && response.success) {
-                if (response.data.length === 0) {
-                    container.innerHTML = '<p style="color: var(--gray); text-align: center;">No hay dependencias definidas.</p>';
-                    return;
-                }
-                
-                container.innerHTML = response.data.map(dep => `
-                    <div class="dependency-item">
-                        <span class="dependency-task">${escapeHtml(dep.origen_nombre)}</span>
-                        <span class="dependency-arrow">➔</span>
-                        <span class="dependency-task">${escapeHtml(dep.destino_nombre)}</span>
-                        <button class="btn btn-icon btn-danger btn-sm" onclick="removeDependency(${dep.origen}, ${dep.destino})">🗑️</button>
-                    </div>
-                `).join('');
+                showToast(response?.error || 'Error', 'error');
             }
         }
 
         async function removeDependency(origen, destino) {
             const response = await apiCall(`dependencies/${origen}/${destino}`, 'DELETE');
-            if (response && response.success) {
-                showAlert('Dependencia eliminada');
-                loadDependencies();
+            if (response?.success) {
+                showToast('Dependencia eliminada');
                 refreshData();
             } else {
-                showAlert(response?.error || 'Error al eliminar dependencia', 'error');
+                showToast(response?.error || 'Error', 'error');
             }
         }
 
-        // Visualizaciones
+        // Views
         async function viewExecutionOrder() {
             const response = await apiCall('execution-order');
-            if (response && response.success) {
-                showResultModal('📊 Orden de Ejecucion (Ordenamiento Topologico)', response.data);
+            if (response?.success) {
+                showResultModal('Orden Topologico', response.data, 
+                    'Este es el orden valido de ejecucion basado en las dependencias (Algoritmo de Kahn).');
             }
         }
 
         async function viewExecutableTasks() {
             const response = await apiCall('executable-tasks');
-            if (response && response.success) {
-                showResultModal('🎯 Tareas Ejecutables Ahora', response.data);
+            if (response?.success) {
+                showResultModal('Tareas Ejecutables', response.data,
+                    'Estas tareas pueden completarse ahora (todas sus dependencias estan completas).');
             }
         }
 
         async function viewNextTask() {
             const response = await apiCall('next-task');
-            if (response && response.success) {
+            if (response?.success) {
                 if (response.data) {
-                    showResultModal('⭐ Siguiente Tarea Recomendada', [response.data]);
+                    showResultModal('Siguiente Tarea Recomendada', [response.data],
+                        'Basado en prioridad y dependencias.');
                 } else {
-                    showResultModal('⭐ Siguiente Tarea', [], 'No hay tareas ejecutables disponibles.');
+                    showResultModal('Siguiente Tarea', [],
+                        'No hay tareas ejecutables disponibles.');
                 }
             }
         }
 
-        function showResultModal(title, tasksList, emptyMessage = null) {
+        function showResultModal(title, tasksList, description) {
             document.getElementById('resultModalTitle').textContent = title;
             const content = document.getElementById('resultModalContent');
             
+            let html = description ? `<p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.85rem;">${description}</p>` : '';
+            
             if (!tasksList || tasksList.length === 0) {
-                content.innerHTML = `<p style="color: var(--gray); text-align: center;">${emptyMessage || 'No hay tareas disponibles.'}</p>`;
+                html += '<p style="color: var(--text-muted); text-align: center;">No hay tareas</p>';
             } else {
-                content.innerHTML = tasksList.map((task, index) => `
-                    <div class="dependency-item">
-                        <span style="font-weight: 600; color: var(--primary);">${index + 1}.</span>
-                        <span class="dependency-task">
-                            <strong>${escapeHtml(task.nombre)}</strong>
-                            <span class="badge badge-priority-${task.prioridad}" style="margin-left: 8px;">⭐ ${task.prioridad}</span>
-                        </span>
+                html += tasksList.map((task, idx) => `
+                    <div class="dep-item">
+                        <span style="color: var(--accent); font-weight: 600;">${idx + 1}.</span>
+                        <span class="dep-task source">${escapeHtml(task.nombre)}</span>
+                        <span class="badge badge-priority">P${task.prioridad}</span>
                     </div>
                 `).join('');
             }
             
+            content.innerHTML = html;
             openModal('resultModal');
         }
 
-        // Filtros
+        // Filters
         function setFilter(filter) {
             currentFilter = filter;
             document.querySelectorAll('.filter-tab').forEach(tab => {
@@ -1594,16 +1923,10 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         }
 
         function updateTaskCount() {
-            const count = tasks.length;
-            document.getElementById('taskCount').textContent = `${count} tarea${count !== 1 ? 's' : ''}`;
+            document.getElementById('taskCount').textContent = tasks.length;
         }
 
-        function selectTask(taskId) {
-            document.querySelectorAll('.task-item').forEach(item => item.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
-        }
-
-        // Utilidades
+        // Utils
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
@@ -1612,42 +1935,32 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         }
 
         function formatStatus(status) {
-            const statusMap = {
-                'pendiente': 'Pendiente',
-                'en_progreso': 'En Progreso',
-                'completada': 'Completada'
-            };
-            return statusMap[status] || status;
+            const map = { 'pendiente': 'Pendiente', 'en_progreso': 'En Progreso', 'completada': 'Completada' };
+            return map[status] || status;
         }
 
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            return new Date(dateStr).toLocaleDateString('es-ES');
-        }
-
-        // Cerrar modales al hacer clic fuera
+        // Close modals on outside click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('active');
-                }
+                if (e.target === modal) modal.classList.remove('active');
             });
         });
 
-        // Inicializacion
+        // Window resize handler for graph
+        window.addEventListener('resize', () => {
+            if (tasks.length > 0) renderGraph();
+        });
+
+        // Init
         document.addEventListener('DOMContentLoaded', () => {
             refreshData();
-            setInterval(() => {
-                loadTasks();
-                loadStatistics();
-            }, 60000);
+            setInterval(refreshData, 60000);
         });
     </script>
 </body>
 </html>'''
 
     def handle_api_get(self):
-        """Maneja API GET requests"""
         path = self.path.split('/api/')[1].split('?')[0]
         path_parts = path.split('/')
         endpoint = path_parts[0]
@@ -1685,14 +1998,14 @@ class ModernWebHandler(BaseHTTPRequestHandler):
                 deps = gestor.db.obtener_todas_dependencias()
                 dep_list = []
                 for origen, destino in deps:
-                    tarea_origen = gestor.obtener_tarea(origen)
-                    tarea_destino = gestor.obtener_tarea(destino)
-                    if tarea_origen and tarea_destino:
+                    t_origen = gestor.obtener_tarea(origen)
+                    t_destino = gestor.obtener_tarea(destino)
+                    if t_origen and t_destino:
                         dep_list.append({
                             'origen': origen,
                             'destino': destino,
-                            'origen_nombre': tarea_origen.nombre,
-                            'destino_nombre': tarea_destino.nombre
+                            'origen_nombre': t_origen.nombre,
+                            'destino_nombre': t_destino.nombre
                         })
                 response = {'success': True, 'data': dep_list}
                 
@@ -1702,7 +2015,6 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         self.send_json(response)
 
     def handle_api_post(self):
-        """Maneja API POST requests"""
         path = self.path.split('/api/')[1]
         path_parts = path.split('/')
         endpoint = path_parts[0]
@@ -1720,16 +2032,32 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         try:
             gestor = get_gestor()
             
-            # Check for complete endpoint first (tasks/{id}/complete)
+            # Check for complete endpoint first
             if len(path_parts) >= 3 and path_parts[0] == 'tasks' and path_parts[2] == 'complete':
                 task_id = int(path_parts[1])
-                exito, mensaje, desbloqueadas = gestor.marcar_completada(task_id)
-                response = {
-                    'success': exito,
-                    'message': mensaje,
-                    'data': {'desbloqueadas': desbloqueadas},
-                    'error': mensaje if not exito else None
-                }
+                
+                # Verify dependencies are completed before allowing completion
+                tarea = gestor.obtener_tarea(task_id)
+                if not tarea:
+                    response = {'success': False, 'error': 'Tarea no encontrada'}
+                else:
+                    # Check if all dependencies are completed
+                    deps = gestor.obtener_dependencias(task_id)
+                    blocking = [d.nombre for d in deps if d.estado != 'completada']
+                    
+                    if blocking:
+                        response = {
+                            'success': False,
+                            'error': f'No se puede completar. Primero completa: {", ".join(blocking)}'
+                        }
+                    else:
+                        exito, mensaje, desbloqueadas = gestor.marcar_completada(task_id)
+                        response = {
+                            'success': exito,
+                            'message': mensaje,
+                            'data': {'desbloqueadas': desbloqueadas},
+                            'error': mensaje if not exito else None
+                        }
             
             elif endpoint == 'tasks':
                 nombre = data.get('nombre', '').strip()
@@ -1767,7 +2095,6 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         self.send_json(response)
 
     def handle_api_put(self):
-        """Maneja API PUT requests"""
         path = self.path.split('/api/')[1]
         path_parts = path.split('/')
         
@@ -1791,6 +2118,18 @@ class ModernWebHandler(BaseHTTPRequestHandler):
                 if not tarea:
                     response = {'success': False, 'error': 'Tarea no encontrada'}
                 else:
+                    # If trying to set status to completed, check dependencies
+                    if data.get('estado') == 'completada' and tarea.estado != 'completada':
+                        deps = gestor.obtener_dependencias(task_id)
+                        blocking = [d.nombre for d in deps if d.estado != 'completada']
+                        if blocking:
+                            response = {
+                                'success': False,
+                                'error': f'No se puede completar. Primero completa: {", ".join(blocking)}'
+                            }
+                            self.send_json(response)
+                            return
+                    
                     if 'nombre' in data:
                         tarea.nombre = data['nombre']
                     if 'descripcion' in data:
@@ -1813,7 +2152,6 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         self.send_json(response)
 
     def handle_api_delete(self):
-        """Maneja API DELETE requests"""
         path = self.path.split('/api/')[1]
         path_parts = path.split('/')
         
@@ -1847,54 +2185,47 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         self.send_json(response)
 
     def send_json(self, data):
-        """Envia una respuesta JSON"""
         self.send_response(200)
         self.send_header('Content-type', 'application/json; charset=utf-8')
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
-        json_str = json.dumps(data, ensure_ascii=False, default=str)
-        self.wfile.write(json_str.encode('utf-8'))
+        self.wfile.write(json.dumps(data, ensure_ascii=False, default=str).encode('utf-8'))
 
     def send_404(self):
-        """Envia un error 404"""
         self.send_response(404)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
         self.wfile.write(json.dumps({'success': False, 'error': 'Not found'}).encode())
 
     def send_error_response(self, error_msg):
-        """Envia una respuesta de error"""
         self.send_response(500)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
         self.wfile.write(json.dumps({'success': False, 'error': error_msg}).encode())
 
     def log_message(self, format, *args):
-        """Reduce logs"""
         pass
 
 
 def main():
-    """Inicia el servidor web"""
     port = 8080
     server_address = ('', port)
     
     print("\n" + "="*60)
-    print("   🚀 GESTOR DE TAREAS CON DEPENDENCIAS - WEB UI")
-    print("   📚 Universidad Don Bosco - PED Fase 2")
+    print("   TASKFLOW - Gestor de Tareas con Dependencias")
+    print("   Universidad Don Bosco - PED Fase 2")
     print("="*60)
-    print(f"\n   🌐 Servidor corriendo en: http://localhost:{port}")
-    print("   📱 Abre esta URL en tu navegador")
-    print("\n   ⏹️  Presiona Ctrl+C para detener el servidor")
+    print(f"\n   Servidor: http://localhost:{port}")
+    print("   Ctrl+C para detener")
     print("="*60 + "\n")
     
     try:
         httpd = HTTPServer(server_address, ModernWebHandler)
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\n\n🛑 Servidor detenido")
+        print("\n   Servidor detenido")
         global _gestor_instance
         if _gestor_instance:
             _gestor_instance.cerrar()
