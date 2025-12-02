@@ -1720,7 +1720,18 @@ class ModernWebHandler(BaseHTTPRequestHandler):
         try:
             gestor = get_gestor()
             
-            if endpoint == 'tasks':
+            # Check for complete endpoint first (tasks/{id}/complete)
+            if len(path_parts) >= 3 and path_parts[0] == 'tasks' and path_parts[2] == 'complete':
+                task_id = int(path_parts[1])
+                exito, mensaje, desbloqueadas = gestor.marcar_completada(task_id)
+                response = {
+                    'success': exito,
+                    'message': mensaje,
+                    'data': {'desbloqueadas': desbloqueadas},
+                    'error': mensaje if not exito else None
+                }
+            
+            elif endpoint == 'tasks':
                 nombre = data.get('nombre', '').strip()
                 if not nombre:
                     response = {'success': False, 'error': 'El nombre es requerido'}
@@ -1749,16 +1760,6 @@ class ModernWebHandler(BaseHTTPRequestHandler):
                         'message': mensaje,
                         'error': mensaje if not exito else None
                     }
-            
-            elif len(path_parts) >= 3 and path_parts[2] == 'complete':
-                task_id = int(path_parts[1])
-                exito, mensaje, desbloqueadas = gestor.marcar_completada(task_id)
-                response = {
-                    'success': exito,
-                    'message': mensaje,
-                    'data': {'desbloqueadas': desbloqueadas},
-                    'error': mensaje if not exito else None
-                }
                 
         except Exception as e:
             response = {'success': False, 'error': str(e)}
