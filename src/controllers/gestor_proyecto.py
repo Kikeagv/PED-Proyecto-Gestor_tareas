@@ -1,16 +1,35 @@
 """
 Gestor de Proyecto
 Controlador principal que coordina todas las operaciones
+Sistema de Gestion de Tareas con Dependencias - Fase 2
+Universidad Don Bosco - PED
 """
 
 from typing import List, Optional, Tuple, Set
+import logging
+
 from models.tarea import Tarea
 from models.grafo_tareas import GrafoTareas
 from models.plan_diario import PlanDiario
 from database.db_manager import DatabaseManager
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+class GestorProyectoError(Exception):
+    """Excepcion personalizada para errores del gestor"""
+    pass
+
+
 class GestorProyecto:
-    """Controlador principal del sistema de gestión de tareas"""
+    """Controlador principal del sistema de gestion de tareas
+    
+    Implementa la logica de negocio utilizando:
+    - Grafo Dirigido Aciclico (DAG) para dependencias
+    - Cola (Queue) para el plan diario
+    - Base de datos SQLite para persistencia
+    """
 
     def __init__(self, db_path: str = "gestor_tareas.db"):
         """
@@ -18,11 +37,19 @@ class GestorProyecto:
 
         Args:
             db_path: Ruta de la base de datos
+            
+        Raises:
+            GestorProyectoError: Si hay error al inicializar
         """
-        self.db = DatabaseManager(db_path)
-        self.grafo = GrafoTareas()
-        self.plan_diario = PlanDiario()
-        self.cargar_desde_db()
+        try:
+            self.db = DatabaseManager(db_path)
+            self.grafo = GrafoTareas()
+            self.plan_diario = PlanDiario()
+            self.cargar_desde_db()
+            logger.info(f"Gestor inicializado con base de datos: {db_path}")
+        except Exception as e:
+            logger.error(f"Error al inicializar gestor: {e}")
+            raise GestorProyectoError(f"Error al inicializar: {e}")
 
     def cargar_desde_db(self) -> None:
         """Carga todas las tareas y dependencias desde la base de datos"""
