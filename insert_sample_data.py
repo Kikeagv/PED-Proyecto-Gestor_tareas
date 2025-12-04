@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script para agregar datos de ejemplo de un proyecto de desarrollo de software
+Script para agregar datos de ejemplo de un proyecto de Dashboard Financiero
 """
 
 import sys
@@ -13,343 +13,372 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 from controllers.gestor_proyecto import GestorProyecto
 
 def crear_proyecto_ejemplo(db_path):
-    """Crea un proyecto de desarrollo de software completo"""
-    print(f"🏗️  Creando proyecto de ejemplo en {db_path}...")
+    """Crea un proyecto de Dashboard Financiero completo"""
+    print(f"💰 Creando proyecto Dashboard Financiero en {db_path}...")
 
     gestor = GestorProyecto(db_path)
 
-    # Fase de Inicio y Planificación
-    print("\n📋 Creando tareas de la Fase de Inicio...")
+    # Fase 1: Análisis y Planificación Financiera
+    print("\n📊 Creando tareas de Análisis Financiero...")
 
-    # Tareas de planificación
-    analisis_id = gestor.crear_tarea(
-        "Análisis de Requisitos",
-        "Levantar y documentar todos los requisitos funcionales y no funcionales del sistema",
+    # Tareas de análisis financiero
+    analisis_requisitos_id = gestor.crear_tarea(
+        "Análisis de Requisitos Financieros",
+        "Levantar y documentar todos los requerimientos para el dashboard financiero: métricas, KPIs, reportes needed",
         5
     )[2]
 
-    investigacion_id = gestor.crear_tarea(
-        "Investigación de Tecnologías",
-        "Investigar y evaluar diferentes tecnologías, frameworks y herramientas para el proyecto",
+    investigacion_fuentes_id = gestor.crear_tarea(
+        "Investigación de Fuentes de Datos",
+        "Identificar y evaluar fuentes de datos: APIs bancarias, sistemas contables, mercados financieros",
         5
     )[2]
 
-    diseño_arq_id = gestor.crear_tarea(
-        "Diseño de Arquitectura",
-        "Diseñar la arquitectura general del sistema, patrones de diseño y componentes principales",
+    diseno_arquitectura_id = gestor.crear_tarea(
+        "Diseño de Arquitectura Financiera",
+        "Diseñar arquitectura para procesamiento de datos financieros con seguridad y compliance",
         5
     )[2]
 
-    # Tareas de configuración
-    setup_id = gestor.crear_tarea(
-        "Configuración del Entorno",
-        "Configurar entorno de desarrollo, control de versiones y herramientas de trabajo",
+    # Setup inicial
+    setup_entorno_id = gestor.crear_tarea(
+        "Configuración del Entorno de Desarrollo",
+        "Configurar entorno seguro para desarrollo financiero con control de versiones y herramientas",
         4
     )[2]
 
-    bd_id = gestor.crear_tarea(
-        "Diseño de Base de Datos",
-        "Diseñar el esquema de base de datos, relaciones normalización",
+    bd_financiera_id = gestor.crear_tarea(
+        "Diseño de Base de Datos Financiera",
+        "Diseñar esquema para transacciones, cuentas, presupuestos, inversiones con auditoría",
         5
     )[2]
 
-    api_id = gestor.crear_tarea(
-        "Diseño de API REST",
-        "Definir endpoints, formatos de request/response y documentación de API",
+    api_financiera_id = gestor.crear_tarea(
+        "Diseño de API Financiera",
+        "Definir endpoints seguros para operaciones bancarias, reportes y análisis de datos",
         4
     )[2]
 
-    # Fase de Desarrollo - Backend
-    print("\n💻 Creando tareas de Desarrollo Backend...")
+    # Fase 2: Backend Financiero
+    print("\n💻 Creando tareas de Backend Financiero...")
 
-    # Autenticación y Seguridad
-    auth_model_id = gestor.crear_tarea(
-        "Modelo de Autenticación",
-        "Implementar sistema de registro, login y gestión de usuarios con JWT",
+    # Seguridad y Autenticación Financiera
+    auth_segura_id = gestor.crear_tarea(
+        "Autenticación Segura Financiera",
+        "Implementar autenticación multi-factor, encriptación y compliant con PSD2 para usuarios financieros",
         5
     )[2]
 
     auth_controller_id = gestor.crear_tarea(
-        "Controlador de Autenticación",
-        "Crear endpoints para registro, login, logout y gestión de sesión",
+        "Controlador de Sesiones Financieras",
+        "Crear endpoints seguros para login/logout con auditoría y tokens JWT de larga duración",
         5
     )[2]
 
-    # Gestión de Usuarios y Roles
-    user_model_id = gestor.crear_tarea(
-        "Modelo de Usuarios y Roles",
-        "Crear entidades de usuario, perfil y roles con permisos",
-        4
-    )[2]
-
-    user_controller_id = gestor.crear_tarea(
-        "CRUD de Usuarios",
-        "Implementar endpoints completos para gestión de usuarios",
-        4
-    )[2]
-
-    # Lógica de Negocio Principal
-    service_core_id = gestor.crear_tarea(
-        "Servicios de Negocio",
-        "Implementar la lógica de negocio principal del sistema",
+    # Gestión de Cuentas y Permisos
+    cuentas_model_id = gestor.crear_tarea(
+        "Modelo de Cuentas Financieras",
+        "Crear entidades para cuentas bancarias, tarjetas, inversiones y perfiles de usuario financiero",
         5
     )[2]
 
-    validations_id = gestor.crear_tarea(
-        "Validaciones y Reglas",
-        "Implementar validaciones de datos y reglas de negocio",
-        4
-    )[2]
-
-    # Integraciones
-    email_id = gestor.crear_tarea(
-        "Servicio de Correo Electrónico",
-        "Implementar envío de correos transaccionales y notificaciones",
-        3
-    )[2]
-
-    storage_id = gestor.crear_tarea(
-        "Servicio de Almacenamiento",
-        "Implementar manejo de archivos, imágenes y documentos",
-        3
-    )[2]
-
-    # Fase de Desarrollo - Frontend
-    print("\n🎨 Creando tareas de Desarrollo Frontend...")
-
-    setup_frontend_id = gestor.crear_tarea(
-        "Setup del Proyecto Frontend",
-        "Configurar React/Vue, webpack, babel y dependencias iniciales",
+    cuentas_controller_id = gestor.crear_tarea(
+        "CRUD de Cuentas Financieras",
+        "Implementar endpoints para gestión completa de cuentas con validaciones y límites de seguridad",
         5
     )[2]
 
-    routing_id = gestor.crear_tarea(
-        "Configuración de Rutas",
-        "Implementar sistema de routing de la aplicación",
-        4
-    )[2]
-
-    state_management_id = gestor.crear_tarea(
-        "Gestión de Estado",
-        "Configurar Redux/Vuex para gestión de estado global",
-        4
-    )[2]
-
-    components_base_id = gestor.crear_tarea(
-        "Componentes Base",
-        "Crear componentes reutilizables (Header, Footer, Buttons, etc)",
-        4
-    )[2]
-
-    auth_ui_id = gestor.crear_tarea(
-        "Interfaz de Autenticación",
-        "Crear formularios de login, registro y gestión de perfil",
+    # Procesamiento de Transacciones
+    transacciones_service_id = gestor.crear_tarea(
+        "Motor de Transacciones",
+        "Implementar motor de procesamiento de transacciones con conciliación y validación financiera",
         5
     )[2]
 
-    dashboard_id = gestor.crear_tarea(
-        "Dashboard Principal",
-        "Crear vista principal del sistema con métricas y navegación",
+    validaciones_financieras_id = gestor.crear_tarea(
+        "Validaciones y Reglas Financieras",
+        "Implementar reglas de negocio: límites, AML, KYC y controles de fraude",
         5
     )[2]
 
-    # Formularios CRUD
-    user_forms_id = gestor.crear_tarea(
-        "Formularios de CRUD de Usuarios",
-        "Crear interfaces para gestión completa de usuarios",
+    # Integraciones Financieras
+    api_bancaria_id = gestor.crear_tarea(
+        "Integración APIs Bancarias",
+        "Conectar con APIs de bancos (Plaid, Open Banking) para sincronización de cuentas",
         4
     )[2]
 
-    # Fase de Testing
-    print("\n🧪 Creando tareas de Testing...")
-
-    unit_backend_id = gestor.crear_tarea(
-        "Tests Unitarios Backend",
-        "Crear pruebas unitarias para servicios y controladores",
+    mercado_datos_id = gestor.crear_tarea(
+        "Conexión Mercados Financieros",
+        "Integrar con APIs de mercados para precios de acciones, ETFs, criptomonedas en tiempo real",
         4
     )[2]
 
-    integration_backend_id = gestor.crear_tarea(
-        "Tests de Integración Backend",
-        "Crear pruebas de integración entre componentes backend",
-        4
-    )[2]
+    # Fase 3: Frontend del Dashboard Financiero
+    print("\n🎨 Creando tareas de Frontend Financiero...")
 
-    unit_frontend_id = gestor.crear_tarea(
-        "Tests Unitarios Frontend",
-        "Crear pruebas unitarias para componentes y utilidades",
-        3
-    )[2]
-
-    e2e_id = gestor.crear_tarea(
-        "Tests End-to-End",
-        "Crear pruebas automatizadas de flujos completos del sistema",
-        4
-    )[2]
-
-    # Fase de Despliegue
-    print("\n🚀 Creando tareas de Despliegue...")
-
-    docker_id = gestor.crear_tarea(
-        "Containerización con Docker",
-        "Crear Dockerfiles y docker-compose para la aplicación",
+    setup_financiero_id = gestor.crear_tarea(
+        "Setup Frontend Financiero",
+        "Configurar React/Next.js con Chart.js, D3.js para visualizaciones financieras",
         5
     )[2]
 
-    ci_cd_id = gestor.crear_tarea(
-        "Configuración CI/CD",
-        "Configurar pipelines automáticos de integración y despliegue",
+    routing_financiero_id = gestor.crear_tarea(
+        "Rutas del Dashboard Financiero",
+        "Implementar routing para: overview, cuentas, inversiones, reportes, configuración",
         4
     )[2]
 
-    deploy_staging_id = gestor.crear_tarea(
-        "Despliegue en Staging",
-        "Configurar y desplegar ambiente de pruebas",
+    state_financiero_id = gestor.crear_tarea(
+        "Estado de Datos Financieros",
+        "Configurar Redux/Redux Toolkit para estado global de datos financieros en caché",
         4
     )[2]
 
-    deploy_production_id = gestor.crear_tarea(
-        "Despliegue en Producción",
-        "Despliegue final del sistema en ambiente productivo",
+    components_financieros_id = gestor.crear_tarea(
+        "Componentes Financieros Base",
+        "Crear CurrencyInputs, FinancialCards, DatePickers, Formatos de moneda",
+        4
+    )[2]
+
+    auth_financiera_ui_id = gestor.crear_tarea(
+        "UI Autenticación Financiera",
+        "Crear login con 2FA, registro con validación KYC, recuperación segura",
         5
     )[2]
 
-    monitoring_id = gestor.crear_tarea(
-        "Configuración de Monitoreo",
-        "Implementar logging, métricas y alertas del sistema",
-        3
+    dashboard_principal_id = gestor.crear_tarea(
+        "Dashboard Principal Financiero",
+        "Crear overview con balances, gastos vs ingresos, net worth, alerts",
+        5
     )[2]
 
-    # Fase de Documentación y Capacitación
-    print("\n📚 Creando tareas de Documentación...")
-
-    api_docs_id = gestor.crear_tarea(
-        "Documentación de API",
-        "Crear documentación técnica y Swagger/OpenAPI de la API",
+    # Componentes Especializados
+    graficos_financieros_id = gestor.crear_tarea(
+        "Gráficos Financieros Interactivos",
+        "Implementar charts: lineas de tiempo, pie charts de gastos, barras de ingresos",
         4
     )[2]
 
-    user_manual_id = gestor.crear_tarea(
-        "Manual de Usuario",
-        "Crear guías y tutoriales para usuarios finales",
-        3
-    )[2]
-
-    deployment_guide_id = gestor.crear_tarea(
-        "Guía de Despliegue",
-        "Documentar proceso de instalación y configuración",
+    cuentas_ui_id = gestor.crear_tarea(
+        "Interfaz de Gestión de Cuentas",
+        "Crear vistas para cuentas bancarias, tarjetas, balances y movimientos",
         4
     )[2]
 
-    # Agregar dependencias entre tareas
+    # Fase 4: Testing Financiero
+    print("\n🧪 Creando tareas de Testing Financiero...")
 
-    print("\n🔗 Creando dependencias entre tareas...")
+    unit_backend_financiero_id = gestor.crear_tarea(
+        "Tests Unitarios Backend Financiero",
+        "Crear pruebas unitarias para transacciones, validaciones AML y cálculos financieros",
+        5
+    )[2]
 
-    # Dependencias de la fase de planificación
-    gestor.agregar_dependencia(analisis_id, diseño_arq_id)  # Análisis -> Arquitectura
-    gestor.agregar_dependencia(analisis_id, bd_id)         # Análisis -> BD
-    gestor.agregar_dependencia(analisis_id, api_id)        # Análisis -> API
-    gestor.agregar_dependencia(investigacion_id, diseño_arq_id)  # Investigación -> Arquitectura
-    gestor.agregar_dependencia(diseño_arq_id, setup_id)    # Arquitectura -> Setup
+    integration_financiero_id = gestor.crear_tarea(
+        "Tests de Integración Financiera",
+        "Probar integración con APIs bancarias y sincronización de datos financieros",
+        5
+    )[2]
 
-    # Dependencias del Backend
-    gestor.agregar_dependencia(diseño_arq_id, auth_model_id)
-    gestor.agregar_dependencia(diseño_arq_id, user_model_id)
-    gestor.agregar_dependencia(diseño_arq_id, service_core_id)
-    gestor.agregar_dependencia(api_id, auth_controller_id)
-    gestor.agregar_dependencia(api_id, user_controller_id)
-    gestor.agregar_dependencia(bd_id, auth_model_id)
-    gestor.agregar_dependencia(bd_id, user_model_id)
-    gestor.agregar_dependencia(auth_model_id, auth_controller_id)
-    gestor.agregar_dependencia(user_model_id, user_controller_id)
-    gestor.agregar_dependencia(service_core_id, validations_id)
+    security_testing_id = gestor.crear_tarea(
+        "Tests de Seguridad Financiera",
+        "Pentesting, auditoría de encriptación y tests de cumplimiento PSD2/GDPR",
+        5
+    )[2]
 
-    # Dependencias de Integraciones
-    gestor.agregar_dependencia(diseño_arq_id, email_id)
-    gestor.agregar_dependencia(diseño_arq_id, storage_id)
+    unit_frontend_financiero_id = gestor.crear_tarea(
+        "Tests Unitarios Frontend Financiero",
+        "Probar componentes financieros: formatos de moneda, gráficos, validaciones",
+        4
+    )[2]
 
-    # Dependencias del Frontend
-    gestor.agregar_dependencia(setup_id, setup_frontend_id)
-    gestor.agregar_dependencia(api_id, routing_id)
-    gestor.agregar_dependencia(diseño_arq_id, state_management_id)
-    gestor.agregar_dependencia(setup_frontend_id, components_base_id)
-    gestor.agregar_dependencia(auth_controller_id, auth_ui_id)
-    gestor.agregar_dependencia(service_core_id, dashboard_id)
-    gestor.agregar_dependencia(user_controller_id, user_forms_id)
-    gestor.agregar_dependencia(components_base_id, auth_ui_id)
+    e2e_financiero_id = gestor.crear_tarea(
+        "Tests End-to-End Financieros",
+        "Probar flujos completos: onboarding KYC, transacciones, reportes mensuales",
+        5
+    )[2]
 
-    # Dependencias de Testing
-    gestor.agregar_dependencia(auth_controller_id, unit_backend_id)
-    gestor.agregar_dependencia(user_controller_id, unit_backend_id)
-    gestor.agregar_dependencia(service_core_id, unit_backend_id)
-    gestor.agregar_dependencia(unit_backend_id, integration_backend_id)
-    gestor.agregar_dependencia(components_base_id, unit_frontend_id)
-    gestor.agregar_dependencia(components_base_id, e2e_id)
+    # Fase 5: Despliegue Seguro Financiero
+    print("\n🚀 Creando tareas de Despliegue Financiero...")
 
-    # Dependencias de Despliegue
-    gestor.agregar_dependencia(unit_backend_id, docker_id)
-    gestor.agregar_dependencia(unit_frontend_id, docker_id)
-    gestor.agregar_dependencia(docker_id, ci_cd_id)
-    gestor.agregar_dependencia(ci_cd_id, deploy_staging_id)
-    gestor.agregar_dependencia(deploy_staging_id, deploy_production_id)
-    gestor.agregar_dependencia(deploy_production_id, monitoring_id)
+    docker_financiero_id = gestor.crear_tarea(
+        "Containerización Segura Financiera",
+        "Crear Dockerfiles con security hardening y secrets management para finanzas",
+        5
+    )[2]
 
-    # Dependencias de Documentación
-    gestor.agregar_dependencia(api_id, api_docs_id)
-    gestor.agregar_dependencia(components_base_id, user_manual_id)
-    gestor.agregar_dependencia(ci_cd_id, deployment_guide_id)
+    ci_cd_financiero_id = gestor.crear_tarea(
+        "Pipeline CI/CD Financiero",
+        "Configurar pipelines con escaneo de seguridad, tests AML y despliegue gradual",
+        5
+    )[2]
+
+    staging_financiero_id = gestor.crear_tarea(
+        "Ambiente Staging Financiero",
+        "Configurar ambiente seguro con datos anonimizados y monitoreo real",
+        4
+    )[2]
+
+    deploy_production_financiero_id = gestor.crear_tarea(
+        "Despliegue Producción Financiera",
+        "Despliegue con blue-green deployment, rollback automático y certificaciones",
+        5
+    )[2]
+
+    monitoring_financiero_id = gestor.crear_tarea(
+        "Monitoreo y Alertas Financieras",
+        "Implementar: fraude detection, anomaly detection, audits logs y alertas regulatorias",
+        4
+    )[2]
+
+    # Fase 6: Documentación Financiera y Cumplimiento
+    print("\n📚 Creando tareas de Documentación Financiera...")
+
+    api_docs_financieros_id = gestor.crear_tarea(
+        "Documentación API Financiera",
+        "Crear API docs con OpenAPI/Swagger incluyendo schemas de transacciones y compliance",
+        4
+    )[2]
+
+    compliance_docs_id = gestor.crear_tarea(
+        "Documentación de Cumplimiento",
+        "Documentar políticas KYC, AML, GDPR y procedimientos regulatorios financieros",
+        5
+    )[2]
+
+    manual_financiero_id = gestor.crear_tarea(
+        "Manual de Usuario Financiero",
+        "Crear guías de onboarding KYC, configuración de cuentas y uso de dashboard",
+        4
+    )[2]
+
+    deployment_financiero_guide_id = gestor.crear_tarea(
+        "Guía Despliegue Seguro",
+        "Documentar proceso de instalación segura, configuración de certificados y auditorías",
+        4
+    )[2]
+
+    # Agregar dependencias financieras realistas
+    print("\n🔗 Creando dependencias financieras entre tareas...")
+
+    # Dependencias de Análisis y Arquitectura
+    gestor.agregar_dependencia(analisis_requisitos_id, diseno_arquitectura_id)  
+    gestor.agregar_dependencia(analisis_requisitos_id, bd_financiera_id)         
+    gestor.agregar_dependencia(analisis_requisitos_id, api_financiera_id)        
+    gestor.agregar_dependencia(investigacion_fuentes_id, diseno_arquitectura_id)  
+    gestor.agregar_dependencia(diseno_arquitectura_id, setup_entorno_id)    
+
+    # Dependencias Backend Financiero
+    gestor.agregar_dependencia(diseno_arquitectura_id, auth_segura_id)
+    gestor.agregar_dependencia(diseno_arquitectura_id, cuentas_model_id)
+    gestor.agregar_dependencia(diseno_arquitectura_id, transacciones_service_id)
+    gestor.agregar_dependencia(api_financiera_id, auth_controller_id)
+    gestor.agregar_dependencia(api_financiera_id, cuentas_controller_id)
+    gestor.agregar_dependencia(bd_financiera_id, auth_segura_id)
+    gestor.agregar_dependencia(bd_financiera_id, cuentas_model_id)
+    gestor.agregar_dependencia(auth_segura_id, auth_controller_id)
+    gestor.agregar_dependencia(cuentas_model_id, cuentas_controller_id)
+    gestor.agregar_dependencia(transacciones_service_id, validaciones_financieras_id)
+
+    # Dependencias de Integraciones Financieras
+    gestor.agregar_dependencia(diseno_arquitectura_id, api_bancaria_id)
+    gestor.agregar_dependencia(diseno_arquitectura_id, mercado_datos_id)
+
+    # Dependencias Frontend Financiero
+    gestor.agregar_dependencia(setup_entorno_id, setup_financiero_id)
+    gestor.agregar_dependencia(api_financiera_id, routing_financiero_id)
+    gestor.agregar_dependencia(diseno_arquitectura_id, state_financiero_id)
+    gestor.agregar_dependencia(setup_financiero_id, components_financieros_id)
+    gestor.agregar_dependencia(auth_controller_id, auth_financiera_ui_id)
+    gestor.agregar_dependencia(transacciones_service_id, dashboard_principal_id)
+    gestor.agregar_dependencia(cuentas_controller_id, cuentas_ui_id)
+    gestor.agregar_dependencia(components_financieros_id, auth_financiera_ui_id)
+    gestor.agregar_dependencia(components_financieros_id, graficos_financieros_id)
+
+    # Dependencias Testing Financiero
+    gestor.agregar_dependencia(auth_controller_id, unit_backend_financiero_id)
+    gestor.agregar_dependencia(cuentas_controller_id, unit_backend_financiero_id)
+    gestor.agregar_dependencia(transacciones_service_id, unit_backend_financiero_id)
+    gestor.agregar_dependencia(unit_backend_financiero_id, integration_financiero_id)
+    gestor.agregar_dependencia(auth_segura_id, security_testing_id)
+    gestor.agregar_dependencia(components_financieros_id, unit_frontend_financiero_id)
+    gestor.agregar_dependencia(dashboard_principal_id, e2e_financiero_id)
+
+    # Dependencias Despliegue Financiero
+    gestor.agregar_dependencia(unit_backend_financiero_id, docker_financiero_id)
+    gestor.agregar_dependencia(unit_frontend_financiero_id, docker_financiero_id)
+    gestor.agregar_dependencia(security_testing_id, docker_financiero_id)
+    gestor.agregar_dependencia(docker_financiero_id, ci_cd_financiero_id)
+    gestor.agregar_dependencia(ci_cd_financiero_id, staging_financiero_id)
+    gestor.agregar_dependencia(staging_financiero_id, deploy_production_financiero_id)
+    gestor.agregar_dependencia(deploy_production_financiero_id, monitoring_financiero_id)
+
+    # Dependencias Documentación Financiera
+    gestor.agregar_dependencia(api_financiera_id, api_docs_financieros_id)
+    gestor.agregar_dependencia(compliance_docs_id, manual_financiero_id)
+    gestor.agregar_dependencia(ci_cd_financiero_id, deployment_financiero_guide_id)
+    gestor.agregar_dependencia(transacciones_service_id, compliance_docs_id)
 
     # Marcar algunas tareas como ya completadas para demostrar el flujo
-    print("\n✅ Marcando algunas tareas como completadas...")
+    print("\n✅ Marcando algunas tareas financieras como completadas...")
 
     tasks_to_complete = [
-        analisis_id, investigacion_id, diseño_arq_id, setup_id, bd_id, api_id,
-        setup_frontend_id, components_base_id
+        analisis_requisitos_id, investigacion_fuentes_id, diseno_arquitectura_id, 
+        setup_entorno_id, bd_financiera_id, api_financiera_id,
+        setup_financiero_id, components_financieros_id
     ]
 
     for task_id in tasks_to_complete:
         gestor.marcar_completada(task_id)
 
-    # Actualizar algunas tareas con fechas límite
-    print("\n📅 Agregando fechas límite a tareas clave...")
+    # Actualizar algunas tareas con fechas límite financieras realistas
+    print("\n📅 Agregando fechas límite financieras a tareas clave...")
 
-    # Establecer fechas límite realistas
+    # Establecer fechas límite realistas con horizonte temporal financiero
     now = datetime.now()
 
-    # Fases tempranas - deadline ya pasado para simular progreso
-    for task_id in [analisis_id, investigacion_id, diseño_arq_id]:
+    # Fases tempranas - deadline ya pasado para simular progreso inicial
+    for task_id in [analisis_requisitos_id, investigacion_fuentes_id, diseno_arquitectura_id]:
         task = gestor.obtener_tarea(task_id)
-        task.fecha_limite = now - timedelta(days=10)
+        task.fecha_limite = now - timedelta(days=15)
         gestor.actualizar_tarea(task)
 
-    # Fases actuales - deadlines próxim
+    # Fases de desarrollo financiero - deadlines próximos (semanal)
     deadline_week1 = now + timedelta(days=7)
-    for task_id in [auth_model_id, user_model_id, service_core_id, routing_id]:
+    for task_id in [auth_segura_id, cuentas_model_id, transacciones_service_id, routing_financiero_id]:
         task = gestor.obtener_tarea(task_id)
         task.fecha_limite = deadline_week1
         gestor.actualizar_tarea(task)
 
-    # Fases medias - deadlines en 2 semanas
+    # Fases de integración y frontend - deadlines en 2 semanas
     deadline_week2 = now + timedelta(days=14)
-    for task_id in [auth_controller_id, user_controller_id, dashboard_id, unit_backend_id]:
+    for task_id in [auth_controller_id, cuentas_controller_id, dashboard_principal_id, unit_backend_financiero_id]:
         task = gestor.obtener_tarea(task_id)
         task.fecha_limite = deadline_week2
         gestor.actualizar_tarea(task)
 
-    # Fases finales - deadlines en 1 mes
+    # Fases de testing y despliegue - deadlines en 3-4 semanas
+    deadline_week3 = now + timedelta(days=21)
+    for task_id in [integration_financiero_id, security_testing_id, docker_financiero_id]:
+        task = gestor.obtener_tarea(task_id)
+        task.fecha_limite = deadline_week3
+        gestor.actualizar_tarea(task)
+
+    # Fases finales y producción - deadlines en 1 mes
     deadline_month = now + timedelta(days=30)
-    for task_id in [deploy_production_id, monitoring_id, api_docs_id]:
+    for task_id in [deploy_production_financiero_id, monitoring_financiero_id, api_docs_financieros_id]:
         task = gestor.obtener_tarea(task_id)
         task.fecha_limite = deadline_month
         gestor.actualizar_tarea(task)
 
     gestor.cerrar()
-    print(f"\n🎉 ¡Proyecto de ejemplo creado exitosamente en {db_path}!")
+    print(f"\n💰 ¡Proyecto Dashboard Financiero creado exitosamente en {db_path}!")
     return True
 
 def main():
     """Función principal"""
-    print("🏗️  CREANDO PROYECTO DE DESARROLLO DE SOFTWARE DE EJEMPLO")
+    print("💰 CREANDO PROYECTO DASHBOARD FINANCIERO DE EJEMPLO")
     print("=" * 60)
 
     databases = [
@@ -361,22 +390,29 @@ def main():
     for db_path in databases:
         try:
             crear_proyecto_ejemplo(db_path)
-            print(f"✅ Base de datos '{db_path}' creada con datos de ejemplo")
+            print(f"✅ Base de datos '{db_path}' creada con dashboard financiero")
         except Exception as e:
             print(f"❌ Error creando {db_path}: {e}")
             return False
 
     print("\n" + "=" * 60)
-    print("🎉 ¡TODAS LAS BASES DE DATOS HAN SIDO INICIALIZADAS CON DATOS DE EJEMPLO!")
-    print("\n📋 RESUMEN DEL PROYECTO CREADO:")
-    print("   • 30 tareas de desarrollo de software")
-    print("   • 5 fases del proyecto (Inicio, Desarrollo, Testing, Despliegue, Documentación)")
-    print("   • +30 dependencias entre tareas")
+    print("💰 ¡TODAS LAS BASES DE DATOS HAN SIDO INICIALIZADAS CON DASHBOARD FINANCIERO!")
+    print("\n📊 RESUMEN DEL PROYECTO FINANCIERO CREADO:")
+    print("   • 26+ tareas especializadas de finanzas y tecnología")
+    print("   • 6 fases financieras (Análisis, Backend, Frontend, Testing, Despliegue, Compliance)")
+    print("   • 35+ dependencias financieras realistas")
     print("   • 8 tareas ya completadas para demostrar flujo de trabajo")
-    print("   • Fechas límite configuradas")
-    print("\n🚀 YA PUEDES USAR CUALQUIER INTERFAZ:")
-    print("   • Web: python3 web_interface.py (recomendado)")
-    print("   • CLI: python3 main_cli.py")
+    print("   • Fechas límite financieras configuradas")
+    print("   • Seguridad y cumplimiento regulatorio integrado")
+    print("\n💡 CARACTERÍSTICAS DEL DASHBOARD FINANCIERO:")
+    print("   • APIs bancarias y Open Banking")
+    print("   • KYC, AML y PSD2 compliance") 
+    print("   • Visualizaciones financieras interactivas")
+    print("   • Testing de seguridad financiera")
+    print("   • Despliegue seguro con auditoría")
+    print("\n🚀 YA PUEDES USAR CUALQUIER INTERFAZ PARA PROBAR:")
+    print("   • Web: python3 start_web.py (recomendado)")
+    print("   • CLI: python3 main_cli.py") 
     print("   • GUI: python3 main.py")
 
     return True
